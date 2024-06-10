@@ -20,4 +20,9 @@ trait ApiResponse
         ];
         return response($response, $code);
     }
+
+    public function sendResponse($code, $data = [])
+    {
+        // ...
+    }
 }
