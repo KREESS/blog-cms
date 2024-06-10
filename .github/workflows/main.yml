@@ -132,7 +132,6 @@ jobs:
         run: ./vendor/bin/phpunit
         env:
           DB_PORT: ${{ job.services.mysql.ports['3306'] }}
-
   laravel_notification:
     name: Laravel Notify
     runs-on: ubuntu-latest
