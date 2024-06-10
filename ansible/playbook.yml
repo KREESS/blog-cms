@@ -1,83 +1,89 @@
 ---
 - name: "Setup Linux, Nginx, MySQL, PHP (LEMP stack)"
-  hosts: "server1"  # Mendefinisikan host di mana playbook akan dijalankan, yaitu server1
-  become: true  # Menentukan bahwa tugas-tugas harus dijalankan dengan hak akses root
+  hosts: "server1"
+  become: true
+  tasks:
+    - name: Wait for apt lock to be released
+      shell: |
+        while fuser /var/lib/dpkg/lock >/dev/null 2>&1 || fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+          echo "Waiting for apt lock..."
+          sleep 5
+        done
 
-  tasks:  # Bagian ini mendefinisikan daftar tugas yang akan dijalankan pada host
     - name: Update and upgrade apt packages
       apt:
-        update_cache: yes  # Mengupdate cache paket apt
-        upgrade: dist  # Mengupgrade semua paket yang terinstal ke versi terbaru yang tersedia
+        update_cache: yes
+        upgrade: dist
 
     - name: Install common packages
       apt:
-        name: "{{ item }}"  # Menentukan paket yang akan diinstal
-        state: present  # Pastikan paket dalam keadaan terinstal
+        name: "{{ item }}"
+        state: present
       loop:
-        - curl  # Daftar paket yang akan diinstal
+        - curl
         - gnupg
         - software-properties-common
         - unzip
 
     - name: Install Nginx
       apt:
-        name: nginx  # Menentukan bahwa Nginx harus diinstal
-        state: present  # Pastikan Nginx dalam keadaan terinstal
+        name: nginx
+        state: present
 
     - name: Ensure Nginx is running
       service:
-        name: nginx  # Nama layanan yang harus dijalankan
-        state: started  # Pastikan layanan sedang berjalan
-        enabled: yes  # Pastikan layanan diatur untuk dimulai saat boot
+        name: nginx
+        state: started
+        enabled: yes
 
-    - name: Install PyMySQL
+    - name: Install PyMySQL (Debian/Ubuntu)
       apt:
-        name: python3-pymysql  # Menentukan bahwa PyMySQL harus diinstal
-        state: present  # Pastikan PyMySQL dalam keadaan terinstal
-      when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"  # Kondisional, hanya jika sistem adalah Ubuntu atau Debian
+        name: python3-pymysql
+        state: present
+      when: ansible_distribution in ["Ubuntu", "Debian"]
 
-    - name: Install PyMySQL
+    - name: Install PyMySQL (CentOS/RedHat)
       yum:
-        name: python3-PyMySQL  # Menentukan bahwa PyMySQL harus diinstal
-        state: present  # Pastikan PyMySQL dalam keadaan terinstal
-      when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"  # Kondisional, hanya jika sistem adalah CentOS atau RedHat
+        name: python3-PyMySQL
+        state: present
+      when: ansible_distribution in ["CentOS", "RedHat"]
 
     - name: Install MySQL server
       apt:
-        name: mysql-server  # Menentukan bahwa MySQL server harus diinstal
-        state: present  # Pastikan MySQL server dalam keadaan terinstal
-        force: yes  # Memaksa instalasi, bahkan jika ada konflik
-        install_recommends: no  # Jangan menginstal paket yang direkomendasikan
+        name: mysql-server
+        state: present
+        force: yes
+        install_recommends: no
 
     - name: Ensure MySQL is running
       service:
-        name: mysql  # Nama layanan yang harus dijalankan
-        state: started  # Pastikan layanan sedang berjalan
-        enabled: yes  # Pastikan layanan diatur untuk dimulai saat boot
+        name: mysql
+        state: started
+        enabled: yes
 
     - name: Set MySQL root password
       mysql_user:
-        name: root  # Nama pengguna MySQL yang akan diubah atau dibuat
-        password:  # Kata sandi baru untuk pengguna root
-        login_unix_socket: /var/run/mysqld/mysqld.sock  # Jalur soket UNIX untuk login MySQL
-        state: present  # Pastikan pengguna dalam keadaan ada
+        name: root
+        password: your_root_password
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        state: present
 
     - name: Remove Apache2 if installed
       apt:
-        name: apache2*  # Menentukan bahwa semua paket yang dimulai dengan apache2 harus dihapus
-        state: absent  # Pastikan paket dalam keadaan tidak terinstal
+        name: apache2*
+        state: absent
 
     - name: Add PHP PPA repository
       apt_repository:
-        repo: ppa:ondrej/php  # Menambahkan repository PPA untuk versi PHP terbaru
-        state: present  # Pastikan repository dalam keadaan ada
+        repo: ppa:ondrej/php
+        state: present
 
     - name: Install PHP 8.3 and common extensions
       apt:
-        name: "{{ item }}"  # Menentukan paket PHP yang akan diinstal
-        state: present  # Pastikan paket dalam keadaan terinstal
+        name: "{{ item }}"
+        state: present
       loop:
-        - php8.3  # Daftar paket PHP yang akan diinstal
+        - php8.3
         - php8.3-fpm
         - php8.3-mysql
         - php8.3-xml
@@ -87,6 +93,6 @@
 
     - name: Ensure PHP-FPM is running
       service:
-        name: php8.3-fpm  # Nama layanan PHP-FPM yang harus dijalankan
-        state: started  # Pastikan layanan sedang berjalan
-        enabled: yes  # Pastikan layanan diatur untuk dimulai saat boot
+        name: php8.3-fpm
+        state: started
+        enabled: yes

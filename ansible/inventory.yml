@@ -1,9 +1,10 @@
-all: # Nama grup utama yang mencakup semua host yang akan diatur
-  hosts: # Bagian ini mendefinisikan daftar host dalam grup 'all'
-    server1: # Nama dari host atau alias yang akan digunakan untuk merujuk ke server ini dalam playbook Ansible
-      ansible_connection: ssh # Menentukan bahwa koneksi ke host akan dilakukan melalui SSH
-      ansible_host: "103.172.204.13" # Alamat IP atau nama domain dari host yang akan dihubungi
-      ansible_port: 22 # Port SSH yang akan digunakan untuk koneksi (default adalah 22)
-      ansible_user: "polindra" # Username yang digunakan untuk login ke host
-      ansible_password: "Qwertyuiop1" # Password yang digunakan untuk autentikasi SSH (tidak direkomendasikan untuk menyimpan password dalam plaintext)
-      ansible_private_key_file: "/mnt/c/Users/adity/.ssh/id_rsa" # Jalur lengkap ke file kunci privat SSH yang digunakan untuk autentikasi
+all:
+  hosts:
+    server1:
+      ansible_connection: ssh
+      ansible_host: "116.193.191.35"
+      ansible_port: 22
+      ansible_user: "polindra"
+      ansible_password: "Polindra1"
+      ansible_private_key_file: "/Users/adity/.ssh/id_rsa"
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
