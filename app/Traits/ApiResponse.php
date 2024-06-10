@@ -11,7 +11,7 @@ trait ApiResponse
         return $this->responseHandle(status: $status, message: $message, data: $data, code: $code);
     }
 
-    private function responseHandle(bool $status, mixed $data = null, string $message = null, int $code)
+    private function responseHandle(bool $status, int $code, mixed $data = null, string $message = null)
     {
         $response = [
             'status' => $status,
