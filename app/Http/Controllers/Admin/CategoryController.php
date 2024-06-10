@@ -52,11 +52,11 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($requiredParameter, $optionalParameter = null)
+    public function show($id)
     {
-        // ...
+        $category = Category::findOrFail($id);
+        return response()->json($category);
     }
-
 
     /**
      * Show the form for editing the specified resource.
